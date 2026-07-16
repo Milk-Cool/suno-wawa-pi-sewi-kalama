@@ -1,0 +1,34 @@
+// @ts-ignore
+import Database from "better-sqlite3";
+import type { Database as DatabaseT } from "better-sqlite3";
+const db: DatabaseT = new Database("translation.db");
+db.pragma("journal_mode = WAL");
+
+export type Translation = {
+    file: string;
+    attribute: number;
+    tokipona: string;
+    time: number;
+    author: string;
+};
+
+export function init() {
+    db.prepare(`CREATE TABLE IF NOT EXISTS translations (
+        id INTEGER PRIMARY KEY,
+        file TEXT NOT NULL,
+        attribute INTEGER NOT NULL,
+        tokipona TEXT NOT NULL,
+        time INTEGER NOT NULL,
+        author TEXT NOT NULL
+    )`).run();
+}
+
+export function getTranslations(file: string, attribute: number) {
+    return db.prepare(`SELECT * FROM translations WHERE file = ? AND attribute = ? ORDER BY time DESC`).all(file, attribute) as Translation[];
+}
+export function getFile(file: string) {
+    return db.prepare(`SELECT * FROM translations WHERE file = ? ORDER BY time DESC`).all(file) as Translation[];
+}
+export function addTranslation(file: string, attribute: number, tokipona: string, author: string) {
+    db.prepare(`INSERT INTO translations (file, attribute, tokipona, time, author) VALUES (?, ?, ?, ?, ?)`).run(file, attribute, tokipona, Date.now(), author);
+}

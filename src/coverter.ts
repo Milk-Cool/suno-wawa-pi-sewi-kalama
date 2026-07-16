@@ -61,12 +61,12 @@ const pronouncuations = {
 };
 
 function convertOne(latin: string) {
-    const split = latin.split(/([\r\n\ue0a0-\ue152])/g);
+    const split = latin.split(/([\r\n\ue0a0-\ue152])/gu);
     return split.map(x => "\r\n".includes(x)
         ? x
         : x.codePointAt(0)! >= 0xe0a0 && x.codePointAt(0)! <= 0xe152
         ? x + pronouncuations[x as keyof typeof pronouncuations]
-        : tokipona.convert(x, "latin", "sitelen-pona/ucsur").replace(/\u{f199c}$/u, "")
+        : tokipona.convert(x, "latin", "sitelen-pona/ucsur").replace(/\u{f199c}$/gu, "")
         + x.replaceAll(" ", "").replaceAll("j", "y").replaceAll(":",".").toLowerCase()).join("");
 }
 export default function convert(latin: string) {
