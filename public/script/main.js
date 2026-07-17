@@ -4,3 +4,5 @@ link("exports", "/pages/exports.html");
 link("files", "/pages/files.html");
 link("history", "/pages/history.html");
 link("login", "/pages/login.html");
+
+document.querySelector("#root").click();
