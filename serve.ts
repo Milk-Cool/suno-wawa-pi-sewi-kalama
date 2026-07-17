@@ -97,8 +97,10 @@ app.post("/build", (req, res) => {
         for(const file of files.listMSBT()) {
             const translations = db.getFile(file);
             if(translations.length === 0) continue;
+            console.log("patching", file);
             const buf = files.patchMSBT(file, translations);
             archive.append(buf, { name: "mesg/" + files.baseLang + "/" + file });
+            console.log("patched", file);
         }
 
         for(const f of fs.readdirSync("fonts")) archive.file(join("fonts", f), { name: "mesg/Font/" + f });

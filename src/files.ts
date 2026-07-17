@@ -31,6 +31,7 @@ export function parseMSBT(path: string, lang = baseLang) {
 }
 export function patchMSBT(path: string, translations: Translation[]) {
     convertMSBT(path, baseLang);
+    console.log("convert to yaml", path);
     const parsed = parse(fs.readFileSync(join("romfs", "mesg", baseLang, path + ".yaml"), "utf-8"), { schema: "failsafe" });
     parsed.SizePerAttribute = 5; // CRUTCH: MSBTConverter incorrectly determines the size as 9 bytes
     for(const k in parsed.Messages) {
@@ -45,5 +46,6 @@ export function patchMSBT(path: string, translations: Translation[]) {
     fs.writeFileSync(p, stringify(parsed, { nullStr: "" }).replace(/(?<=^\s*)"null":$/gm, `null:`)); // CRUTCH: we have null as our key sometimes
     
     convert(p);
+    console.log("convert to msbt", path);
     return fs.readFileSync(p.replace(/\.yaml$/, ""));
 }
