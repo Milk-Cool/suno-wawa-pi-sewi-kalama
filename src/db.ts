@@ -43,6 +43,9 @@ export function init() {
         hash TEXT NOT NULL
     )`).run();
 }
+export function quit() {
+    db.close();
+}
 
 export function getTranslations(file: string, attribute: number) {
     return db.prepare(`SELECT * FROM translations WHERE file = ? AND attribute = ? ORDER BY time DESC`).all(file, attribute) as Translation[];

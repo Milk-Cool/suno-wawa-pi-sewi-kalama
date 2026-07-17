@@ -116,4 +116,9 @@ app.get("/builds", (_req, res) => {
 });
 app.use("/builds", express.static("builds"));
 
+process.on("SIGINT", () => {
+    db.quit();
+    process.exit(0);
+});
+
 app.listen(14339);
