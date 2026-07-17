@@ -25,6 +25,9 @@ app.get("/files/:name", (req, res) => {
 app.get("/translations/:file", (req, res) => {
     res.send(db.getFile(req.params.file));
 });
+app.get("/history/:page", (req, res) => {
+    res.send(db.getHistory(parseInt(req.params.page)));
+});
 app.get("/translations/:file/:attribute", (req, res) => {
     res.send(db.getTranslations(req.params.file, parseInt(req.params.attribute)));
 });

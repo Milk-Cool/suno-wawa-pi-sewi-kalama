@@ -40,6 +40,9 @@ export function getTranslations(file: string, attribute: number) {
 export function getFile(file: string) {
     return db.prepare(`SELECT * FROM translations WHERE file = ? ORDER BY time DESC`).all(file) as Translation[];
 }
+export function getHistory(page: number, per: number = 100) {
+    return db.prepare(`SELECT * FROM translations ORDER BY time DESC LIMIT ? OFFSET ?`).all(per, per * page) as Translation[];
+}
 export function addTranslation(file: string, attribute: number, tokipona: string, author: string) {
     db.prepare(`INSERT INTO translations (file, attribute, tokipona, time, author) VALUES (?, ?, ?, ?, ?)`).run(file, attribute, tokipona, Date.now(), author);
 }

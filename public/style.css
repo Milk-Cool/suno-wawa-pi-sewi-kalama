@@ -61,3 +61,7 @@ body {
 #table td:nth-last-child(1) {
     white-space: nowrap;
 }
+
+li {
+    white-space: pre;
+}
