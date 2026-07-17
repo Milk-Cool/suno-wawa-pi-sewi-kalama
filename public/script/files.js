@@ -32,7 +32,7 @@ const loadFile = async (name) => {
                 attribute: pair.attribute.toString(),
                 text: inp.value
             }) });
-            f.status === 200 ? alert("saved!") : alert("invalid toki pona text");
+            f.status === 403 ? alert("you're not logged in!") : f.status === 200 ? alert("saved!") : alert("invalid toki pona text");
         });
         button.innerText = "save";
         td3.appendChild(button);

@@ -15,6 +15,7 @@ document.querySelector("#build").addEventListener("click", async () => {
     document.querySelector("#build").disabled = true;
     document.querySelector("#build").innerText = "build started. please don't close or refresh the page";
     const f = await fetch("/build", { method: "POST" });
-    if(f.status !== 200) alert("something went wrong! please contact the administrators");
+    if(f.status === 403) alert("you're not logged in!");
+    else if(f.status !== 200) alert("something went wrong! please contact the administrators");
     location.reload();
 });
