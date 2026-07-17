@@ -1,0 +1,39 @@
+* {
+    font-family: sans-serif;
+}
+:root {
+    --topbar-height: 4em;
+}
+
+#topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: var(--topbar-height);
+    line-height: var(--topbar-height);
+
+    background: darkslateblue;
+}
+#topbar > a {
+    vertical-align: middle;
+    height: var(--topbar-height);
+    font-size: x-large;
+    
+    color: white;
+
+    margin-left: 1em;
+}
+
+#content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--topbar-height));
+    border: none;
+}
+
+.center {
+    text-align: center;
+}

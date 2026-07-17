@@ -37,9 +37,11 @@ app.post("/build", (_req, res) => {
     try {
         building = true;
 
-        const out = fs.createWriteStream(join("builds", new Date().toISOString() + ".zip"));
+        const fname = new Date().toISOString() + ".zip";
+        const out = fs.createWriteStream(join("builds", fname));
         const archive = new ZipArchive();
         out.on("close", () => {
+            db.addExport(fname, "TODO");
             res.send({ ok: true });
         });
         archive.pipe(out);
@@ -51,13 +53,19 @@ app.post("/build", (_req, res) => {
             archive.append(buf, { name: "mesg/" + files.baseLang + "/" + file });
         }
 
+        for(const f of fs.readdirSync("fonts")) archive.file(join("fonts", f), { name: "mesg/Font/" + f });
+
         archive.finalize();
     } catch(e) {
         console.error(e);
-        res.send({ ok: false });
+        res.status(500).send({ ok: false });
     } finally {
         building = false;
     }
 });
+app.get("/builds", (_req, res) => {
+    res.send(db.getExports());
+});
+app.use("/builds", express.static("builds"));
 
 app.listen(14339);

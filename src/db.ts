@@ -11,6 +11,11 @@ export type Translation = {
     time: number;
     author: string;
 };
+export type Export = {
+    file: string;
+    time: number;
+    author: string;
+};
 
 export function init() {
     db.prepare(`CREATE TABLE IF NOT EXISTS translations (
@@ -18,6 +23,12 @@ export function init() {
         file TEXT NOT NULL,
         attribute INTEGER NOT NULL,
         tokipona TEXT NOT NULL,
+        time INTEGER NOT NULL,
+        author TEXT NOT NULL
+    )`).run();
+    db.prepare(`CREATE TABLE IF NOT EXISTS exports (
+        id INTEGER PRIMARY KEY,
+        file TEXT NOT NULL,
         time INTEGER NOT NULL,
         author TEXT NOT NULL
     )`).run();
@@ -31,4 +42,11 @@ export function getFile(file: string) {
 }
 export function addTranslation(file: string, attribute: number, tokipona: string, author: string) {
     db.prepare(`INSERT INTO translations (file, attribute, tokipona, time, author) VALUES (?, ?, ?, ?, ?)`).run(file, attribute, tokipona, Date.now(), author);
+}
+
+export function getExports() {
+    return db.prepare(`SELECT * FROM exports ORDER BY time DESC`).all() as Export[];
+}
+export function addExport(file: string, author: string) {
+    db.prepare(`INSERT INTO exports (file, time, author) VALUES (?, ?, ?)`).run(file, Date.now(), author);
 }

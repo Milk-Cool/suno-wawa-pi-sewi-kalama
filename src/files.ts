@@ -22,8 +22,10 @@ export function convertMSBT(path: string, lang = baseLang) {
     convert(join("romfs", "mesg", lang, path));
 }
 export function parseMSBT(path: string, lang = baseLang) {
-    convertMSBT(path, lang);
-    const parsed = parse(fs.readFileSync(join("romfs", "mesg", lang, path + ".yaml"), "utf-8"), { schema: "failsafe" });
+    const fullpath = join("romfs", "mesg", lang, path + ".yaml");
+    if(!fs.existsSync(fullpath)) // we do not edit the original file so it should be fine
+        convertMSBT(path, lang);
+    const parsed = parse(fs.readFileSync(fullpath, "utf-8"), { schema: "failsafe" });
     // @ts-ignore
     return Object.values(parsed.Messages).map(x => ({ attribute: parseInt(x.Attribute.toString(), 16), text: x.Contents } as LocalizedString));
 }
