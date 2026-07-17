@@ -4,6 +4,7 @@ import * as files from "./src/files.ts";
 import fs from "fs";
 import { ZipArchive } from "archiver";
 import { join } from "path";
+import { default as convertTP } from "./src/coverter.ts";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -17,7 +18,8 @@ app.get("/files", (_req, res) => {
     res.send(files.listMSBT());
 });
 app.get("/files/:name", (req, res) => {
-    res.send(files.parseMSBT(req.params.name));
+    if(req.params.name.includes("..") || req.params.name.includes("/") || req.params.name.includes("\\")) return res.status(400).send({ ok: false });
+    res.send(files.parseMSBT(req.params.name, req.query.en ? files.enLang : files.baseLang));
 });
 
 app.get("/translations/:file", (req, res) => {
@@ -27,6 +29,8 @@ app.get("/translations/:file/:attribute", (req, res) => {
     res.send(db.getTranslations(req.params.file, parseInt(req.params.attribute)));
 });
 app.post("/translations", (req, res) => {
+    try { convertTP(req.body.text); }
+    catch(_) { return res.status(400).send({ ok: false }); }
     db.addTranslation(req.body.file, parseInt(req.body.attribute), req.body.text, "TODO");
     res.send({ ok: true });
 });

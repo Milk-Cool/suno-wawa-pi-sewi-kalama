@@ -4,6 +4,9 @@
 :root {
     --topbar-height: 4em;
 }
+body {
+    overflow-x: hidden;
+}
 
 #topbar {
     position: fixed;
@@ -36,4 +39,25 @@
 
 .center {
     text-align: center;
+}
+
+#table {
+    border: none;
+    width: 75vw;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#filesdiv {
+    width: 25vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#table td {
+    margin-left: .5vw;
+    margin-right: .5vw;
+}
+#table td:nth-last-child(1) {
+    white-space: nowrap;
 }
