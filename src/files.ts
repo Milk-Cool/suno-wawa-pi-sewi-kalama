@@ -47,5 +47,18 @@ export function patchMSBT(path: string, translations: Translation[]) {
     
     convert(p);
     console.log("convert to msbt", path);
-    return fs.readFileSync(p.replace(/\.yaml$/, ""));
+    const b = fs.readFileSync(p.replace(/\.yaml$/, ""));
+    fs.unlinkSync(p.replace(/\.yaml$/, ""));
+    return b;
+}
+
+export function listTex(path: string = ".") {
+    const read = fs.readdirSync(join("romfs", "graph", path));
+    const out: string[] = [];
+    for(const file of read) {
+        const p = join("romfs", "graph", path, file);
+        if(fs.statSync(p).isDirectory()) out.push(...listTex(join(path, file)));
+        else if(p.endsWith(".tex")) out.push(join(path, file));
+    }
+    return out;
 }

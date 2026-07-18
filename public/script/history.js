@@ -5,7 +5,7 @@ const upd = async page => {
     const j = await f.json();
     for(const translation of j) {
         const el = document.createElement("li");
-        el.innerText = `#${translation.id} / by ${translation.author} / ${new Date(translation.time).toUTCString()}\nattribute #${translation.attribute}: ${translation.tokipona}`;
+        el.innerText = `#${translation.id} / by ${translation.author} / ${new Date(translation.time).toUTCString()}\nfile ${translation.file}, attribute #${translation.attribute}:\n${translation.tokipona}`;
         document.querySelector("#history").appendChild(el);
     }
 };

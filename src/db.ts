@@ -12,6 +12,13 @@ export type Translation = {
     time: number;
     author: string;
 };
+export type Sprite = {
+    file: string;
+    png: Buffer;
+    time: number;
+    author: string;
+};
+export type HistorySprite = Omit<Sprite, "png">;
 export type Export = {
     file: string;
     time: number;
@@ -28,6 +35,13 @@ export function init() {
         file TEXT NOT NULL,
         attribute INTEGER NOT NULL,
         tokipona TEXT NOT NULL,
+        time INTEGER NOT NULL,
+        author TEXT NOT NULL
+    )`).run();
+    db.prepare(`CREATE TABLE IF NOT EXISTS sprites (
+        id INTEGER PRIMARY KEY,
+        file TEXT NOT NULL,
+        png BLOB NOT NULL,
         time INTEGER NOT NULL,
         author TEXT NOT NULL
     )`).run();
@@ -58,6 +72,16 @@ export function getHistory(page: number, per: number = 100) {
 }
 export function addTranslation(file: string, attribute: number, tokipona: string, author: string) {
     db.prepare(`INSERT INTO translations (file, attribute, tokipona, time, author) VALUES (?, ?, ?, ?, ?)`).run(file, attribute, tokipona, Date.now(), author);
+}
+
+export function getSprite(file: string) {
+    return (db.prepare(`SELECT png FROM sprites WHERE file = ? ORDER BY time DESC LIMIT 1`).get(file) as Sprite)?.png;
+}
+export function getSpriteHistory() {
+    return db.prepare(`SELECT id, file, time, author FROM sprites ORDER BY time DESC`).all() as HistorySprite[];
+}
+export function addSprite(file: string, png: Buffer, author: string) {
+    db.prepare(`INSERT INTO sprites (file, png, time, author) VALUES (?, ?, ?, ?)`).run(file, png, Date.now(), author);
 }
 
 export function getExports() {

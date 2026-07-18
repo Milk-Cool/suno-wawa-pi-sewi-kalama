@@ -2,6 +2,10 @@ import "dotenv/config";
 import * as db from "./src/db.ts";
 import { parseArgs } from "util";
 import { randomBytes } from "crypto";
+import { default as convertTex } from "./src/tex.ts";
+import multer from "multer";
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const { values } = parseArgs({
     options: {
@@ -29,9 +33,10 @@ import express from "express";
 import * as files from "./src/files.ts";
 import fs from "fs";
 import { ZipArchive } from "archiver";
-import { join } from "path";
+import { join, resolve } from "path";
 import { default as convertTP } from "./src/coverter.ts";
 import cookieParser from "cookie-parser";
+import { tmpdir } from "os";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -39,6 +44,7 @@ app.use(cookieParser());
 db.init();
 
 const dangerous = (p: string) => p.includes("..") || p.includes("/") || p.includes("\\");
+const dangerousSprite = (p: string) => !resolve(join("romfs", "graph", p)).startsWith(resolve(join("romfs", "graph")))
 
 if(!fs.existsSync("builds"))
     fs.mkdirSync("builds");
@@ -58,6 +64,9 @@ app.post("/auth", (req, res) => {
     return res.cookie("token", req.body.token, { sameSite: "lax" }).redirect("/pages/root.html");
 });
 
+app.get("/history/sprites", (_req, res) => {
+    res.send(db.getSpriteHistory());
+});
 app.get("/history/:page", (req, res) => {
     res.send(db.getHistory(parseInt(req.params.page)));
 });
@@ -76,6 +85,33 @@ app.post("/translations", (req, res) => {
     try { convertTP(req.body.text); }
     catch(_) { return res.status(400).send({ ok: false }); }
     db.addTranslation(req.body.file, parseInt(req.body.attribute), req.body.text, name);
+    res.send({ ok: true });
+});
+
+app.get("/sprites", (_req, res) => {
+    res.send(files.listTex());
+});
+app.get("/sprites/get", (req, res) => {
+    if(dangerousSprite(req.query.file as string)) return res.status(400).send({ ok: false });
+    
+    const p = join("romfs", "graph", req.query.file as string);
+    if(!fs.existsSync(p + ".png"))
+        convertTex("decode", p);
+    res.setHeader("content-type", "image/png").sendFile(resolve(p + ".png"));
+});
+app.get("/sprites/translated", (req, res) => {
+    if(dangerousSprite(req.query.file as string)) return res.status(400).send({ ok: false });
+    
+    const b = db.getSprite(req.query.file as string);
+    if(!b) return res.status(404).send({ ok: false });
+    res.setHeader("content-type", "image/png").send(b);
+});
+app.post("/sprites", upload.single("png"), (req, res) => {
+    const name = db.authUser(req.cookies?.token || "");
+    if(!name) return res.status(403).send({ ok: false });
+    if(dangerousSprite(req.body.file as string) || !req.file) return res.status(400).send({ ok: false });
+
+    db.addSprite(req.body.file, req.file.buffer, name);
     res.send({ ok: true });
 });
 
@@ -104,6 +140,20 @@ app.post("/build", (req, res) => {
             const buf = files.patchMSBT(file, translations);
             archive.append(buf, { name: "mesg/" + files.baseLang + "/" + file });
             console.log("patched", file);
+        }
+
+        for(const file of files.listTex()) {
+            const sprite = db.getSprite(file);
+            if(!sprite) continue;
+            console.log("converting and pushing", file);
+            const p1 = join(tmpdir(), randomBytes(4).toString("hex") + ".png");
+            fs.writeFileSync(p1, sprite);
+            const p2 = join(tmpdir(), randomBytes(4).toString("hex") + ".tex");
+            convertTex("encode", p1, p2);
+            archive.append(fs.readFileSync(p2), { name: "graph/" + file });
+            fs.unlinkSync(p1);
+            fs.unlinkSync(p2);
+            console.log("converted and pushed", file);
         }
 
         for(const f of fs.readdirSync("fonts")) archive.file(join("fonts", f), { name: "mesg/Font/" + f });

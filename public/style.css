@@ -41,7 +41,7 @@ body {
     text-align: center;
 }
 
-#table {
+#table, #preview {
     border: none;
     width: 75vw;
     position: absolute;

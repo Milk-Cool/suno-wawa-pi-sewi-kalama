@@ -159,3 +159,6 @@ msbt/*
 
 # Builds
 builds/
+
+# textool
+textool
