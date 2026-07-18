@@ -38,6 +38,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 db.init();
 
+const dangerous = (p: string) => p.includes("..") || p.includes("/") || p.includes("\\");
+
 if(!fs.existsSync("builds"))
     fs.mkdirSync("builds");
 
@@ -46,7 +48,7 @@ app.get("/files", (_req, res) => {
     res.send(files.listMSBT());
 });
 app.get("/files/:name", (req, res) => {
-    if(req.params.name.includes("..") || req.params.name.includes("/") || req.params.name.includes("\\")) return res.status(400).send({ ok: false });
+    if(dangerous(req.params.name)) return res.status(400).send({ ok: false });
     res.send(files.parseMSBT(req.params.name, req.query.en ? files.enLang : files.baseLang));
 });
 
@@ -69,6 +71,7 @@ app.get("/translations/:file/:attribute", (req, res) => {
 app.post("/translations", (req, res) => {
     const name = db.authUser(req.cookies?.token || "");
     if(!name) return res.status(403).send({ ok: false });
+    if(dangerous(req.body.file)) return res.status(400).send({ ok: false });
 
     try { convertTP(req.body.text); }
     catch(_) { return res.status(400).send({ ok: false }); }
