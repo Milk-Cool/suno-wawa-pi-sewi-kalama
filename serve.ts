@@ -156,7 +156,9 @@ app.post("/build", (req, res) => {
             console.log("converted and pushed", file);
         }
 
-        for(const f of fs.readdirSync("fonts")) archive.file(join("fonts", f), { name: "mesg/Font/" + f });
+        for(const f of fs.readdirSync("fonts").filter(x => x !== "map.txt")) archive.file(join("fonts", f), { name: "mesg/Font/" + f });
+        for(const [name, contents] of fs.readFileSync(join("fonts", "map.txt"), "utf-8").split("\n").filter(x => x).map(x => x.split("=")))
+            archive.file(join("fonts", contents), { name: "mesg/Font/" + name })
 
         archive.finalize();
     } catch(e) {
