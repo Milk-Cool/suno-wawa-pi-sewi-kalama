@@ -71,11 +71,11 @@ function convertOne(latin: string) {
         : tokipona.convert(x, "latin", "sitelen-pona/ucsur").replace(/\u{f199c}$/gu, "")
         + (x.includes("<")
         ? x
-        : x.replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw])a/g, "á")
-        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw])i/g, "í")
-        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw])u/g, "ú")
-        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw])e/g, "é")
-        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw])o/g, "ó")
+        : x.replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw]?)a/g, "á")
+        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw]?)i/g, "í")
+        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw]?)u/g, "ú")
+        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw]?)e/g, "é")
+        .replace(/(?<=(^|\s|\(|\.|\?|!)[jklmnpstw]?)o/g, "ó")
         .replaceAll(" ", "(").replaceAll("j", "y").replaceAll(":",".").toLowerCase())).join("");
 }
 export default function convert(latin: string) {
