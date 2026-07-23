@@ -75,7 +75,7 @@ function convertOne(latin: string) {
         .replace(/(?<=(^|\s|\.|\?|!)[jklmnpstw])u/g, "ú")
         .replace(/(?<=(^|\s|\.|\?|!)[jklmnpstw])e/g, "é")
         .replace(/(?<=(^|\s|\.|\?|!)[jklmnpstw])o/g, "ó"))
-        .replaceAll(" ", "").replaceAll("j", "y").replaceAll(":",".").toLowerCase()).join("");
+        .replaceAll(" ", "(").replaceAll("j", "y").replaceAll(":",".").toLowerCase()).join("");
 }
 export default function convert(latin: string) {
     const split = latin.split(/(<Tag_\d+>)/g);
